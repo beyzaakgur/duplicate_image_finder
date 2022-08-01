@@ -8,7 +8,7 @@ location="disgust" # location of pictures
 search = dif(location)
 
 search.result
-
+print(search.result)
 search.lower_quality
 
 df = pd.DataFrame(search.lower_quality)
