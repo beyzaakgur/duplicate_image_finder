@@ -23,7 +23,7 @@ print(files)
 len(files)
 
 search.stats
-
+print(search.stats)
 destination = "move/disgust"
 
 for file in files:
