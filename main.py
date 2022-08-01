@@ -1,41 +1,40 @@
-
 import shutil
-import os
 from difPy import dif
 import pandas as pd
-
-location="disgust" # location of pictures
-search = dif(location)
-
-search.result
-print(search.result)
-search.lower_quality
-
-df = pd.DataFrame(search.lower_quality)
-df.to_csv("disgust.csv")
-
-files=[]
-
-for i  in search.lower_quality:
-  files.append(i[len(location)+1:])
-
-print(files)
-len(files)
-
-search.stats
-print(search.stats)
-destination = "move/disgust"
-
-for file in files:
-    path = os.path.join(location, file)
-    shutil.move(path, destination)
-
-# importing os module
+import sys
 import os
-# Path
-for file in files:
-  path = os.path.join(location, file)
-  # Remove the file
-  # 'file.txt'
-  os.remove(path)
+import imagehash
 
+
+class difpy_mod(object):
+
+    def __init__(self, *args):
+        self.location = args[0][1]
+        self.destination = args[0][2]
+        # self.filepath = args[4]
+
+    def searched(self):
+        search = dif(self.location)
+        files = []
+        for i in search.lower_quality:
+            files.append(i[len(self.location) + 1:])
+        return [search, files]
+
+
+# move
+# delete
+# threshold
+# cosine similarity
+# l2 similarity
+
+def main():
+    args = sys.argv[1:]
+    if sys.argv[1] == "method1":
+        a = difpy_mod(args)
+        a.searched()
+    else:
+        print("There is no library such as,", sys.argv[1])
+
+
+if __name__ == "__main__":
+    main()
