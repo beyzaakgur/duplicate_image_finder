@@ -129,12 +129,8 @@ class difpy_mod(object):
             shutil.move(path, self.destination)
 
 
-# move
-# delete
-# threshold
-# cosine similarity
-# l2 similarity
-
+# readme dosyası yazılsın
+# pull request için farklı branch aç
 
 def main():
     args = sys.argv[1:]
@@ -151,3 +147,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
