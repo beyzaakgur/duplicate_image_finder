@@ -47,14 +47,14 @@ class difpy_mod(object):
 
         final_weights = {}
 
-        for i in range(50):
+        for i in range(len(paths)):
             weights = []
             img1 = Image.open(paths[i])
             img1_reshape = img1.resize((round(img1.size[0] * 0.5), round(img1.size[1] * 0.5)))
             img_array1 = np.array(img1_reshape)
             img_array1 = img_array1.flatten()
             img_array1 = img_array1 / 255
-            for j in range(i + 1, 50):
+            for j in range(i + 1, len(paths)):
                 img2 = Image.open(paths[j])
                 img2_reshape = img2.resize((round(img1.size[0] * 0.5), round(img1.size[1] * 0.5)))
                 img_array2 = np.array(img2_reshape)
@@ -64,7 +64,7 @@ class difpy_mod(object):
                 similarity = -1 * (spatial.distance.cosine(img_array1, img_array2) - 1)
                 if similarity >= 0.94:
                     weights.append([similarity, paths[j]])
-            print(i)
+            print(f"\rNumber of process: [{i}/{len(paths)}]", "[{}%]".format(int((i / len(paths)) * 100)), end="")
             if weights != []:
                 final_weights[paths[i]] = weights
 
@@ -98,11 +98,11 @@ class difpy_mod(object):
 
         paths = glob.glob(self.location + "/*")  # photos path
         final_weights = {}
-        for i in range(50):
+        for i in range(len(paths)):
             weights = []
             image1 = Image.open(paths[i])
             image1 = make_regalur_image(image1)
-            for j in range(i + 1, 50):
+            for j in range(i + 1, len(paths)):
                 image2 = Image.open(paths[j])
                 image2 = make_regalur_image(image2)
                 # print("The similarity between pictures is", calc_similar(image1, image2))
@@ -110,7 +110,7 @@ class difpy_mod(object):
                 # print(similarity)
                 if similarity >= 0.4:
                     weights.append([similarity, paths[j]])
-            print(i)
+            print(f"\rNumber of process: [{i}/{len(paths)}]", "[{}%]".format(int((i / len(paths)) * 100)), end="")
             if weights != []:
                 final_weights[paths[i]] = weights
 
@@ -147,4 +147,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
