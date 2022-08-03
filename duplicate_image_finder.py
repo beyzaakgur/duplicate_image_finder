@@ -169,13 +169,16 @@ class duplicate_image_finder(object):
             shutil.move(path, self.destination)
 
 
+
+
+
 # readme dosyası yazılsın
 # pull request için farklı branch aç
 
 def main():
     args = sys.argv[1:]
     if sys.argv[1] == "method1":
-        a = difpy_mod(args)
+        a = duplicate_image_finder(args)
         # a.searched()
         # a.move()
         # a.delete()
@@ -188,6 +191,5 @@ def main():
 
 if __name__ == "__main__":
     main()
-
 #solid
 #principles
