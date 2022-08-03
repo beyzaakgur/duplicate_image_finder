@@ -7,9 +7,12 @@ import glob
 from PIL import Image
 import numpy as np
 from scipy import spatial
+import cv2 as cv
+from skimage.metrics import structural_similarity as sss
+import pandas as pd
 
 
-class difpy_mod(object):
+class duplicate_image_finder(object):
 
     def __init__(self, *args):
         self.location = args[0][1]
@@ -23,10 +26,11 @@ class difpy_mod(object):
             files.append(i[len(self.location) + 1:])
         return [search, files]
 
-    def move(self):
+    def move(self, search):
         search = self.searched()
-        for file in search[1]:
-            path = os.path.join(self.location, file)
+        for file in search[0].lower_quality:
+            # path = os.path.join(self.location, file)
+            path = file
             if not os.path.exists(self.destination):
                 os.mkdir(self.destination)
             shutil.move(path, self.destination)
@@ -41,6 +45,11 @@ class difpy_mod(object):
             if not os.path.exists(directory):
                 os.mkdir(directory)
             shutil.move(path, directory)
+
+    def duplicate_csv(self):
+        search = self.searched()
+        duplicate = pd.DataFrame(search[1])
+        duplicate.to_csv(f"Duplicate_{self.location}.csv")
 
     def cosine(self):
         paths = glob.glob(self.location + "/*")  # photos path
@@ -128,6 +137,37 @@ class difpy_mod(object):
                 os.mkdir(self.destination)
             shutil.move(path, self.destination)
 
+    def ssim(self):
+        paths = glob.glob(self.location + "/*")  # photos path
+        final_weights = {}
+        for i in range(10):
+            weights = []
+            img1 = cv.imread(paths[i])
+            for j in range(i + 1, 10):
+                img2 = cv.imread(paths[j])
+                img2 = np.resize(img2, (img1.shape[0], img1.shape[1], img1.shape[2]))
+                ssim = sss(img1, img2, multichannel=True)
+                if ssim >= 0.2:
+                    weights.append([ssim, paths[j]])
+            if weights != []:
+                final_weights[paths[i]] = weights
+
+            print(f"\rNumber of process: [{i}/{len(paths)}]", "[{}%]".format(int((i / len(paths)) * 100)), end="")
+
+        files = []
+
+        for i in final_weights.values():
+            for j in i:
+                files.append(j[1])
+
+        files = set(files)
+
+        for file in files:
+            path = file
+            if not os.path.exists(self.destination):
+                os.mkdir(self.destination)
+            shutil.move(path, self.destination)
+
 
 # readme dosyası yazılsın
 # pull request için farklı branch aç
@@ -139,11 +179,15 @@ def main():
         # a.searched()
         # a.move()
         # a.delete()
-        # a.cosine()
-        a.histogram()
+        a.cosine()
+        # a.histogram()
+        #a.duplicate_csv()
     else:
         print("There is no library such as,", sys.argv[1])
 
 
 if __name__ == "__main__":
     main()
+
+#solid
+#principles
