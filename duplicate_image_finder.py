@@ -51,7 +51,7 @@ class duplicate_image_finder(object):
         duplicate = pd.DataFrame(search[1])
         duplicate.to_csv(f"Duplicate_{self.location}.csv")
 
-    def cosine(self):
+    def cosine(self, threshold):
         paths = glob.glob(self.location + "/*")  # photos path
 
         final_weights = {}
@@ -71,25 +71,16 @@ class duplicate_image_finder(object):
                 img_array2 = img_array2 / 255
 
                 similarity = -1 * (spatial.distance.cosine(img_array1, img_array2) - 1)
-                if similarity >= 0.94:
+                if similarity >= threshold:
                     weights.append([similarity, paths[j]])
             print(f"\rNumber of process: [{i}/{len(paths)}]", "[{}%]".format(int((i / len(paths)) * 100)), end="")
             if weights != []:
                 final_weights[paths[i]] = weights
 
-        files = []
-        for i in list(final_weights.values()):
-            for j in i:
-                files.append(j[1])
+        return final_weights
 
-        files = set(files)
-        for file in files:
-            path = file
-            if not os.path.exists(self.destination):
-                os.mkdir(self.destination)
-            shutil.move(path, self.destination)
 
-    def histogram(self):
+    def histogram(self, threshold):
         def make_regalur_image(img, size=(64, 64)):
             gray_image = img.resize(size).convert('RGB')
             return gray_image
@@ -117,27 +108,16 @@ class duplicate_image_finder(object):
                 # print("The similarity between pictures is", calc_similar(image1, image2))
                 similarity = calc_similar(image1, image2)
                 # print(similarity)
-                if similarity >= 0.4:
+                if similarity >= threshold:
                     weights.append([similarity, paths[j]])
             print(f"\rNumber of process: [{i}/{len(paths)}]", "[{}%]".format(int((i / len(paths)) * 100)), end="")
             if weights != []:
                 final_weights[paths[i]] = weights
 
-        files = []
+        return final_weights
 
-        for i in final_weights.values():
-            for j in i:
-                files.append(j[1])
+    def ssim(self, threshold):
 
-        files = set(files)
-
-        for file in files:
-            path = file
-            if not os.path.exists(self.destination):
-                os.mkdir(self.destination)
-            shutil.move(path, self.destination)
-
-    def ssim(self):
         paths = glob.glob(self.location + "/*")  # photos path
         final_weights = {}
         for i in range(10):
@@ -147,16 +127,22 @@ class duplicate_image_finder(object):
                 img2 = cv.imread(paths[j])
                 img2 = np.resize(img2, (img1.shape[0], img1.shape[1], img1.shape[2]))
                 ssim = sss(img1, img2, multichannel=True)
-                if ssim >= 0.2:
+                if ssim >= threshold:
                     weights.append([ssim, paths[j]])
             if weights != []:
                 final_weights[paths[i]] = weights
 
             print(f"\rNumber of process: [{i}/{len(paths)}]", "[{}%]".format(int((i / len(paths)) * 100)), end="")
 
+        return final_weights
+
+
+    def remove(self, function, threshold):
+        self.function = function(threshold)
+
         files = []
 
-        for i in final_weights.values():
+        for i in self.function.values():
             for j in i:
                 files.append(j[1])
 
@@ -168,13 +154,6 @@ class duplicate_image_finder(object):
                 os.mkdir(self.destination)
             shutil.move(path, self.destination)
 
-
-
-
-
-# readme dosyası yazılsın
-# pull request için farklı branch aç
-
 def main():
     args = sys.argv[1:]
     if sys.argv[1] == "method1":
@@ -182,14 +161,13 @@ def main():
         # a.searched()
         # a.move()
         # a.delete()
-        a.cosine()
+        # a.cosine()
         # a.histogram()
-        #a.duplicate_csv()
+        # a.duplicate_csv()
+        a.remove(a.cosine, 0.94)
     else:
         print("There is no library such as,", sys.argv[1])
 
-
 if __name__ == "__main__":
     main()
-#solid
-#principles
+
