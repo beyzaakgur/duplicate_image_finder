@@ -15,8 +15,8 @@ import pandas as pd
 class duplicate_image_finder(object):
 
     def __init__(self, *args):
-        self.location = args[0][1]
-        self.destination = args[0][2]
+        self.location = args[0]
+        self.destination = args[1]
         # self.filepath = args[4]
 
     def searched(self):
@@ -26,7 +26,7 @@ class duplicate_image_finder(object):
             files.append(i[len(self.location) + 1:])
         return [search, files]
 
-    def move(self, search):
+    def move(self):
         search = self.searched()
         for file in search[0].lower_quality:
             # path = os.path.join(self.location, file)
@@ -154,20 +154,4 @@ class duplicate_image_finder(object):
                 os.mkdir(self.destination)
             shutil.move(path, self.destination)
 
-def main():
-    args = sys.argv[1:]
-    if sys.argv[1] == "method1":
-        a = duplicate_image_finder(args)
-        # a.searched()
-        # a.move()
-        # a.delete()
-        # a.cosine()
-        # a.histogram()
-        # a.duplicate_csv()
-        a.remove(a.cosine, 0.94)
-    else:
-        print("There is no library such as,", sys.argv[1])
-
-if __name__ == "__main__":
-    main()
 
